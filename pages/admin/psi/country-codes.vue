@@ -125,7 +125,7 @@ import type { PsiCountryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin', ssr: false })
 
-const loading = ref(true)
+const loading = ref(false)
 const items = ref<PsiCountryCode[]>([])
 const fetchError = ref('')
 const errorMsg = ref('')
@@ -144,11 +144,11 @@ const fetchData = async () => {
   loading.value = true
   fetchError.value = ''
   try {
-    const res = await $fetch<{ data: PsiCountryCode[] }>('/api/psi/country-codes')
-    items.value = res.data || []
+    const res = await fetch('/api/psi/country-codes')
+    const json = await res.json()
+    items.value = json.data || []
   } catch (err: unknown) {
-    const e = err as { data?: { statusMessage?: string }; message?: string }
-    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+    fetchError.value = String(err) || '載入失敗'
   } finally {
     loading.value = false
   }

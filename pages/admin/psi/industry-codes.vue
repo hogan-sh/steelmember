@@ -119,7 +119,7 @@ import type { PsiIndustryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin', ssr: false })
 
-const loading = ref(true)
+const loading = ref(false)
 const items = ref<PsiIndustryCode[]>([])
 const fetchError = ref('')
 const errorMsg = ref('')
@@ -138,11 +138,11 @@ const fetchData = async () => {
   loading.value = true
   fetchError.value = ''
   try {
-    const res = await $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes')
-    items.value = res.data || []
+    const res = await fetch('/api/psi/industry-codes')
+    const json = await res.json()
+    items.value = json.data || []
   } catch (err: unknown) {
-    const e = err as { data?: { statusMessage?: string }; message?: string }
-    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+    fetchError.value = String(err) || '載入失敗'
   } finally {
     loading.value = false
   }
