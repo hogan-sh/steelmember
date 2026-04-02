@@ -117,8 +117,6 @@ import type { PsiIndustryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const items = ref<PsiIndustryCode[]>([])
-const fetchError = ref('')
 const errorMsg = ref('')
 const modal = reactive({
   show: false,
@@ -126,24 +124,18 @@ const modal = reactive({
   form: {} as Partial<PsiIndustryCode>,
 })
 
+const { data, pending: loading, error: fetchErr, refresh: fetchData } = await useAsyncData(
+  'psi-industry-codes',
+  () => $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes')
+)
+
+const items = computed(() => data.value?.data || [])
+const fetchError = computed(() => fetchErr.value?.message || '')
+
 const getAuthHeaders = () => {
   const token = process.client ? localStorage.getItem('auth_token') : null
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
-
-const { pending: loading, refresh: fetchData } = await useAsyncData(
-  'psi-industry-codes',
-  async () => {
-    fetchError.value = ''
-    try {
-      const res = await $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes')
-      items.value = res.data || []
-    } catch (err: unknown) {
-      const e = err as { data?: { statusMessage?: string }; message?: string }
-      fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
-    }
-  }
-)
 
 const openModal = (item?: PsiIndustryCode) => {
   errorMsg.value = ''
@@ -173,5 +165,4 @@ const save = async () => {
     modal.saving = false
   }
 }
-
 </script>

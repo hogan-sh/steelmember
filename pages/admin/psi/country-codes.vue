@@ -123,8 +123,6 @@ import type { PsiCountryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const items = ref<PsiCountryCode[]>([])
-const fetchError = ref('')
 const errorMsg = ref('')
 const modal = reactive({
   show: false,
@@ -132,24 +130,18 @@ const modal = reactive({
   form: {} as Partial<PsiCountryCode>,
 })
 
+const { data, pending: loading, error: fetchErr, refresh: fetchData } = await useAsyncData(
+  'psi-country-codes',
+  () => $fetch<{ data: PsiCountryCode[] }>('/api/psi/country-codes')
+)
+
+const items = computed(() => data.value?.data || [])
+const fetchError = computed(() => fetchErr.value?.message || '')
+
 const getAuthHeaders = () => {
   const token = process.client ? localStorage.getItem('auth_token') : null
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
-
-const { pending: loading, refresh: fetchData } = await useAsyncData(
-  'psi-country-codes',
-  async () => {
-    fetchError.value = ''
-    try {
-      const res = await $fetch<{ data: PsiCountryCode[] }>('/api/psi/country-codes')
-      items.value = res.data || []
-    } catch (err: unknown) {
-      const e = err as { data?: { statusMessage?: string }; message?: string }
-      fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
-    }
-  }
-)
 
 const openModal = (item?: PsiCountryCode) => {
   errorMsg.value = ''

@@ -135,8 +135,6 @@ import type { PsiProductCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const items = ref<PsiProductCode[]>([])
-const fetchError = ref('')
 const errorMsg = ref('')
 const modal = reactive({
   show: false,
@@ -144,24 +142,18 @@ const modal = reactive({
   form: {} as Partial<PsiProductCode>,
 })
 
+const { data, pending: loading, error: fetchErr, refresh: fetchData } = await useAsyncData(
+  'psi-product-codes',
+  () => $fetch<{ data: PsiProductCode[] }>('/api/psi/product-codes')
+)
+
+const items = computed(() => data.value?.data || [])
+const fetchError = computed(() => fetchErr.value?.message || '')
+
 const getAuthHeaders = () => {
   const token = process.client ? localStorage.getItem('auth_token') : null
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
-
-const { pending: loading, refresh: fetchData } = await useAsyncData(
-  'psi-product-codes',
-  async () => {
-    fetchError.value = ''
-    try {
-      const res = await $fetch<{ data: PsiProductCode[] }>('/api/psi/product-codes')
-      items.value = res.data || []
-    } catch (err: unknown) {
-      const e = err as { data?: { statusMessage?: string }; message?: string }
-      fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
-    }
-  }
-)
 
 const openModal = (item?: PsiProductCode) => {
   errorMsg.value = ''
