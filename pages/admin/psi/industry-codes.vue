@@ -117,7 +117,6 @@ import type { PsiIndustryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const loading = ref(true)
 const items = ref<PsiIndustryCode[]>([])
 const fetchError = ref('')
 const errorMsg = ref('')
@@ -132,19 +131,19 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-const fetchData = async () => {
-  loading.value = true
-  fetchError.value = ''
-  try {
-    const res = await $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes', { headers: getAuthHeaders() })
-    items.value = res.data || []
-  } catch (err: unknown) {
-    const e = err as { data?: { statusMessage?: string }; message?: string }
-    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
-  } finally {
-    loading.value = false
+const { pending: loading, refresh: fetchData } = await useAsyncData(
+  'psi-industry-codes',
+  async () => {
+    fetchError.value = ''
+    try {
+      const res = await $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes')
+      items.value = res.data || []
+    } catch (err: unknown) {
+      const e = err as { data?: { statusMessage?: string }; message?: string }
+      fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+    }
   }
-}
+)
 
 const openModal = (item?: PsiIndustryCode) => {
   errorMsg.value = ''
@@ -175,5 +174,4 @@ const save = async () => {
   }
 }
 
-onMounted(fetchData)
 </script>

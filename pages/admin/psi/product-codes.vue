@@ -135,7 +135,6 @@ import type { PsiProductCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const loading = ref(true)
 const items = ref<PsiProductCode[]>([])
 const fetchError = ref('')
 const errorMsg = ref('')
@@ -150,19 +149,19 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-const fetchData = async () => {
-  loading.value = true
-  fetchError.value = ''
-  try {
-    const res = await $fetch<{ data: PsiProductCode[] }>('/api/psi/product-codes', { headers: getAuthHeaders() })
-    items.value = res.data || []
-  } catch (err: unknown) {
-    const e = err as { data?: { statusMessage?: string }; message?: string }
-    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
-  } finally {
-    loading.value = false
+const { pending: loading, refresh: fetchData } = await useAsyncData(
+  'psi-product-codes',
+  async () => {
+    fetchError.value = ''
+    try {
+      const res = await $fetch<{ data: PsiProductCode[] }>('/api/psi/product-codes')
+      items.value = res.data || []
+    } catch (err: unknown) {
+      const e = err as { data?: { statusMessage?: string }; message?: string }
+      fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+    }
   }
-}
+)
 
 const openModal = (item?: PsiProductCode) => {
   errorMsg.value = ''
@@ -193,5 +192,4 @@ const save = async () => {
   }
 }
 
-onMounted(fetchData)
 </script>

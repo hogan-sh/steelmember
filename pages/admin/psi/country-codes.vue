@@ -123,7 +123,6 @@ import type { PsiCountryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const loading = ref(true)
 const items = ref<PsiCountryCode[]>([])
 const fetchError = ref('')
 const errorMsg = ref('')
@@ -138,19 +137,19 @@ const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-const fetchData = async () => {
-  loading.value = true
-  fetchError.value = ''
-  try {
-    const res = await $fetch<{ data: PsiCountryCode[] }>('/api/psi/country-codes', { headers: getAuthHeaders() })
-    items.value = res.data || []
-  } catch (err: unknown) {
-    const e = err as { data?: { statusMessage?: string }; message?: string }
-    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
-  } finally {
-    loading.value = false
+const { pending: loading, refresh: fetchData } = await useAsyncData(
+  'psi-country-codes',
+  async () => {
+    fetchError.value = ''
+    try {
+      const res = await $fetch<{ data: PsiCountryCode[] }>('/api/psi/country-codes')
+      items.value = res.data || []
+    } catch (err: unknown) {
+      const e = err as { data?: { statusMessage?: string }; message?: string }
+      fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+    }
   }
-}
+)
 
 const openModal = (item?: PsiCountryCode) => {
   errorMsg.value = ''
@@ -181,5 +180,4 @@ const save = async () => {
   }
 }
 
-onMounted(fetchData)
 </script>

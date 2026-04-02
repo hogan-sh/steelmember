@@ -14,6 +14,9 @@ export default defineEventHandler((event) => {
     '/api/auth/login',
     '/api/auth/logout',
     '/api/public/',
+    '/api/psi/industry-codes',
+    '/api/psi/product-codes',
+    '/api/psi/country-codes',
   ]
 
   if (publicEndpoints.some(ep => path.startsWith(ep))) {
