@@ -142,9 +142,9 @@ const modal = reactive({
   form: {} as Partial<PsiProductCode>,
 })
 
-const { data, pending: loading, error: fetchErr, refresh: fetchData } = await useAsyncData(
-  'psi-product-codes',
-  () => $fetch<{ data: PsiProductCode[] }>('/api/psi/product-codes')
+const { data, pending: loading, error: fetchErr, refresh: fetchData } = useFetch<{ data: PsiProductCode[] }>(
+  '/api/psi/product-codes',
+  { server: false, lazy: true }
 )
 
 const items = computed(() => data.value?.data || [])
