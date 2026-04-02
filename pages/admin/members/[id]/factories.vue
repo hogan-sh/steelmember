@@ -134,7 +134,7 @@
 <script setup lang="ts">
 import type { Factory } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)

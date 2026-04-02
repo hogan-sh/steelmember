@@ -149,7 +149,7 @@
 import type { MemberFee } from '~/types'
 import { PAYMENT_TYPE_MAP } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
