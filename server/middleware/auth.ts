@@ -4,13 +4,15 @@ export default defineEventHandler((event) => {
   const url = getRequestURL(event)
   const path = url.pathname
 
-  // Only protect /api routes that aren't auth routes
-  if (!path.startsWith('/api/') || path.startsWith('/api/auth/')) {
+  // Only protect /api routes
+  if (!path.startsWith('/api/')) {
     return
   }
 
   // Public API endpoints (no auth required)
   const publicEndpoints = [
+    '/api/auth/login',
+    '/api/auth/logout',
     '/api/public/',
   ]
 

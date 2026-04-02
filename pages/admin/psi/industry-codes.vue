@@ -117,7 +117,7 @@ import type { PsiIndustryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const loading = ref(false)
+const loading = ref(true)
 const items = ref<PsiIndustryCode[]>([])
 const fetchError = ref('')
 const errorMsg = ref('')

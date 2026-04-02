@@ -37,6 +37,7 @@ export const useAuthStore = defineStore('auth', {
 
         this.user = response.user
         this.token = response.token
+        this.initialized = true
 
         // Store token in localStorage for persistence
         if (process.client) {
