@@ -52,21 +52,23 @@
             <tr v-else-if="items.length === 0">
               <td colspan="6" class="text-center py-12 text-gray-400 text-sm">尚無產品代碼資料</td>
             </tr>
-            <tr v-for="item in items" v-else :key="item.id">
-              <td class="font-mono text-xs text-gray-500">{{ item.product_serial }}</td>
-              <td class="font-mono text-sm font-medium">{{ item.product_code }}</td>
-              <td class="hidden sm:table-cell text-gray-600 dark:text-gray-400">{{ item.data_type }}</td>
-              <td class="font-medium text-gray-900 dark:text-white">{{ item.product_name }}</td>
-              <td class="hidden md:table-cell text-gray-500 dark:text-gray-400 text-sm">{{ item.product_en_name }}</td>
-              <td>
-                <button
-                  class="text-xs px-2 py-1 rounded text-ocean-blue-600 dark:text-ocean-blue-400 hover:bg-ocean-blue-50 dark:hover:bg-ocean-blue-900/20 transition-colors"
-                  @click="openModal(item)"
-                >
-                  編輯
-                </button>
-              </td>
-            </tr>
+            <template v-else>
+              <tr v-for="item in items" :key="item.id">
+                <td class="font-mono text-xs text-gray-500">{{ item.product_serial }}</td>
+                <td class="font-mono text-sm font-medium">{{ item.product_code }}</td>
+                <td class="hidden sm:table-cell text-gray-600 dark:text-gray-400">{{ item.data_type }}</td>
+                <td class="font-medium text-gray-900 dark:text-white">{{ item.product_name }}</td>
+                <td class="hidden md:table-cell text-gray-500 dark:text-gray-400 text-sm">{{ item.product_en_name }}</td>
+                <td>
+                  <button
+                    class="text-xs px-2 py-1 rounded text-ocean-blue-600 dark:text-ocean-blue-400 hover:bg-ocean-blue-50 dark:hover:bg-ocean-blue-900/20 transition-colors"
+                    @click="openModal(item)"
+                  >
+                    編輯
+                  </button>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -135,6 +137,9 @@ import type { PsiProductCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
+const loading = ref(true)
+const items = ref<PsiProductCode[]>([])
+const fetchError = ref('')
 const errorMsg = ref('')
 const modal = reactive({
   show: false,
@@ -142,18 +147,26 @@ const modal = reactive({
   form: {} as Partial<PsiProductCode>,
 })
 
-const { data, pending: loading, error: fetchErr, refresh: fetchData } = useFetch<{ data: PsiProductCode[] }>(
-  '/api/psi/product-codes',
-  { server: false, lazy: true }
-)
-
-const items = computed(() => data.value?.data || [])
-const fetchError = computed(() => fetchErr.value?.message || '')
-
 const getAuthHeaders = () => {
   const token = process.client ? localStorage.getItem('auth_token') : null
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
+
+const fetchData = async () => {
+  loading.value = true
+  fetchError.value = ''
+  try {
+    const res = await $fetch<{ data: PsiProductCode[] }>('/api/psi/product-codes')
+    items.value = res.data || []
+  } catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string }; message?: string }
+    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchData)
 
 const openModal = (item?: PsiProductCode) => {
   errorMsg.value = ''

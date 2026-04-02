@@ -49,7 +49,8 @@
             <tr v-else-if="items.length === 0">
               <td colspan="3" class="text-center py-12 text-gray-400 text-sm">尚無行業代碼資料</td>
             </tr>
-            <tr v-for="item in items" v-else :key="item.id">
+            <template v-else>
+            <tr v-for="item in items" :key="item.id">
               <td class="font-mono text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.industry_code }}</td>
               <td class="text-gray-900 dark:text-white">{{ item.industry_name }}</td>
               <td>
@@ -61,6 +62,7 @@
                 </button>
               </td>
             </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -117,6 +119,9 @@ import type { PsiIndustryCode } from '~/types'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
+const loading = ref(true)
+const items = ref<PsiIndustryCode[]>([])
+const fetchError = ref('')
 const errorMsg = ref('')
 const modal = reactive({
   show: false,
@@ -124,18 +129,26 @@ const modal = reactive({
   form: {} as Partial<PsiIndustryCode>,
 })
 
-const { data, pending: loading, error: fetchErr, refresh: fetchData } = useFetch<{ data: PsiIndustryCode[] }>(
-  '/api/psi/industry-codes',
-  { server: false, lazy: true }
-)
-
-const items = computed(() => data.value?.data || [])
-const fetchError = computed(() => fetchErr.value?.message || '')
-
 const getAuthHeaders = () => {
   const token = process.client ? localStorage.getItem('auth_token') : null
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
+
+const fetchData = async () => {
+  loading.value = true
+  fetchError.value = ''
+  try {
+    const res = await $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes')
+    items.value = res.data || []
+  } catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string }; message?: string }
+    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchData)
 
 const openModal = (item?: PsiIndustryCode) => {
   errorMsg.value = ''
