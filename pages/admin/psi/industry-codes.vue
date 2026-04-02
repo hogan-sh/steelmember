@@ -43,6 +43,9 @@
                 </div>
               </td>
             </tr>
+            <tr v-else-if="fetchError">
+              <td colspan="3" class="text-center py-12 text-eco-red-500 text-sm">載入失敗：{{ fetchError }}</td>
+            </tr>
             <tr v-else-if="items.length === 0">
               <td colspan="3" class="text-center py-12 text-gray-400 text-sm">尚無行業代碼資料</td>
             </tr>
@@ -116,6 +119,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const loading = ref(false)
 const items = ref<PsiIndustryCode[]>([])
+const fetchError = ref('')
 const errorMsg = ref('')
 const modal = reactive({
   show: false,
@@ -130,11 +134,13 @@ const getAuthHeaders = () => {
 
 const fetchData = async () => {
   loading.value = true
+  fetchError.value = ''
   try {
     const res = await $fetch<{ data: PsiIndustryCode[] }>('/api/psi/industry-codes', { headers: getAuthHeaders() })
     items.value = res.data || []
-  } catch (err) {
-    console.error(err)
+  } catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string }; message?: string }
+    fetchError.value = e.data?.statusMessage || e.message || '載入失敗'
   } finally {
     loading.value = false
   }
