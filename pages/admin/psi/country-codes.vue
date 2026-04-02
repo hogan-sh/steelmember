@@ -123,7 +123,7 @@
 <script setup lang="ts">
 import type { PsiCountryCode } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
+definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const loading = ref(false)
 const items = ref<PsiCountryCode[]>([])

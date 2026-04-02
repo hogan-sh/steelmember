@@ -234,7 +234,6 @@ import type { Member } from '~/types'
 definePageMeta({
   layout: 'admin',
   middleware: 'admin',
-  pageTransition: false,
 })
 
 const route = useRoute()

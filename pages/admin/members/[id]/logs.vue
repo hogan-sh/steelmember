@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import type { ChangeLog } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
+definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)

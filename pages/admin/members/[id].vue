@@ -180,7 +180,6 @@ import { MEMBER_STATUS_MAP, FACTORY_AREA_MAP, MAJOR_NUMBER_MAP } from '~/types'
 definePageMeta({
   layout: 'admin',
   middleware: 'admin',
-  pageTransition: false,
 })
 
 const route = useRoute()
