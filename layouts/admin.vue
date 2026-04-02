@@ -140,6 +140,8 @@ const sidebarOpen = ref(true)
 const roleLabel = computed(() => {
   const map: Record<string, string> = {
     admin: '系統管理員',
+    editor: '編輯',
+    observer: '觀察',
     adminfee: '費用管理員',
     admins: '統計管理員',
     member: '會員',
@@ -198,6 +200,12 @@ const navGroups = computed(() => [
       { path: '/admin/psi/country-codes', label: '國家代碼', icon: resolveComponent('IconCountry') },
     ],
   },
+  ...(authStore.canManageAccounts ? [{
+    label: '系統設定',
+    items: [
+      { path: '/admin/accounts', label: '帳號管理', icon: resolveComponent('IconAccount') },
+    ],
+  }] : []),
 ])
 
 // Simple icon components using SVG
@@ -246,6 +254,9 @@ const IconProduct = {
 const IconCountry = {
   template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
 }
+const IconAccount = {
+  template: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+}
 
 const isActive = (path: string) => {
   if (path === '/admin') return route.path === '/admin'
@@ -275,6 +286,7 @@ const breadcrumbs = computed(() => {
     'industry-codes': '產業代碼',
     'product-codes': '產品代碼',
     'country-codes': '國家代碼',
+    accounts: '帳號管理',
   }
 
   let currentPath = '/admin'

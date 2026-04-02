@@ -13,21 +13,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/admin/login')
   }
 
-  // Role-based access control
+  // Account management: admin only
   const role = authStore.user?.role
-
-  // Fee-only routes
-  if (to.path.startsWith('/admin/fees') && role === 'admins') {
-    return navigateTo('/admin')
-  }
-
-  // Statistics/representatives routes
-  if (
-    (to.path.startsWith('/admin/representatives') ||
-     to.path.startsWith('/admin/attendance') ||
-     to.path.startsWith('/admin/supervisors')) &&
-    role === 'adminfee'
-  ) {
+  if (to.path.startsWith('/admin/accounts') && role !== 'admin') {
     return navigateTo('/admin')
   }
 })

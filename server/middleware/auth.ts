@@ -44,4 +44,17 @@ export default defineEventHandler((event) => {
       statusMessage: '未授權：Token 無效或已過期',
     })
   }
+
+  const role = event.context.user?.role
+  const method = getMethod(event)
+
+  // Observer role: read-only access
+  if (role === 'observer' && method !== 'GET') {
+    throw createError({ statusCode: 403, statusMessage: '觀察者帳號僅限瀏覽，無法修改資料' })
+  }
+
+  // Account management: admin only
+  if (path.startsWith('/api/admin/') && role !== 'admin') {
+    throw createError({ statusCode: 403, statusMessage: '帳號管理僅限管理者操作' })
+  }
 })

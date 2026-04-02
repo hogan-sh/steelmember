@@ -12,8 +12,8 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => !!state.user,
     isAdmin: (state) => state.user?.role === 'admin',
-    isAdminFee: (state) => state.user?.role === 'adminfee' || state.user?.role === 'admin',
-    isAdminS: (state) => state.user?.role === 'admins' || state.user?.role === 'admin',
+    canWrite: (state) => ['admin', 'editor', 'adminfee', 'admins'].includes(state.user?.role || ''),
+    canManageAccounts: (state) => state.user?.role === 'admin',
     userRole: (state) => state.user?.role,
     userName: (state) => state.user?.account,
   },
