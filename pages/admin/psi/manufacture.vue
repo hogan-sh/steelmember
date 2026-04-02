@@ -81,9 +81,6 @@
                 </div>
               </td>
             </tr>
-            <tr v-else-if="!searched">
-              <td colspan="4" class="text-center py-12 text-gray-400 text-sm">請輸入查詢條件後點擊查詢</td>
-            </tr>
             <tr v-else-if="items.length === 0">
               <td colspan="4" class="text-center py-12 text-gray-400 text-sm">查無符合資料</td>
             </tr>
@@ -128,7 +125,6 @@ import type { PsiManufacture } from '~/types'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const loading = ref(false)
-const searched = ref(false)
 const items = ref<PsiManufacture[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -143,7 +139,6 @@ const getAuthHeaders = () => {
 const fetchData = async (p = 1) => {
   loading.value = true
   page.value = p
-  searched.value = true
   const params = new URLSearchParams({ page: String(p), pageSize: String(pageSize) })
   if (filter.year_month) params.set('year_month', filter.year_month)
   if (filter.member_number) params.set('member_number', filter.member_number)
@@ -166,8 +161,8 @@ const resetFilter = () => {
   filter.year_month = ''
   filter.member_number = ''
   filter.product_serial = ''
-  items.value = []
-  total.value = 0
-  searched.value = false
+  fetchData(1)
 }
+
+onMounted(() => fetchData(1))
 </script>
