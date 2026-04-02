@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import type { PsiProductCode } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
 
 const loading = ref(false)
 const items = ref<PsiProductCode[]>([])
@@ -166,7 +166,7 @@ const fetchData = async () => {
   }
 }
 
-if (process.client) fetchData()
+onMounted(fetchData)
 
 const openModal = (item?: PsiProductCode) => {
   errorMsg.value = ''

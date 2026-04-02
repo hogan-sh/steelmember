@@ -123,7 +123,7 @@
 <script setup lang="ts">
 import type { PsiCountryCode } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
 
 const loading = ref(false)
 const items = ref<PsiCountryCode[]>([])
@@ -154,7 +154,7 @@ const fetchData = async () => {
   }
 }
 
-if (process.client) fetchData()
+onMounted(fetchData)
 
 const openModal = (item?: PsiCountryCode) => {
   errorMsg.value = ''
