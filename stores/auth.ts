@@ -39,7 +39,9 @@ export const useAuthStore = defineStore('auth', {
         this.token = response.token
         this.initialized = true
 
-        // Store token in localStorage for persistence
+        // Store in cookie (accessible server-side for SSR) and localStorage
+        const cookie = useCookie('auth_token', { maxAge: 60 * 60 * 8, sameSite: 'lax', path: '/' })
+        cookie.value = response.token
         if (process.client) {
           localStorage.setItem('auth_token', response.token)
         }
@@ -61,6 +63,8 @@ export const useAuthStore = defineStore('auth', {
       }
       this.user = null
       this.token = null
+      const cookie = useCookie('auth_token')
+      cookie.value = null
       if (process.client) {
         localStorage.removeItem('auth_token')
       }
@@ -69,7 +73,10 @@ export const useAuthStore = defineStore('auth', {
     async fetchCurrentUser() {
       if (this.initialized) return
 
-      const token = process.client ? localStorage.getItem('auth_token') : null
+      // Read from cookie (works on both server and client)
+      const authCookie = useCookie('auth_token')
+      const token = authCookie.value || (process.client ? localStorage.getItem('auth_token') : null)
+
       if (!token) {
         this.initialized = true
         return
@@ -85,6 +92,7 @@ export const useAuthStore = defineStore('auth', {
       } catch {
         this.user = null
         this.token = null
+        authCookie.value = null
         if (process.client) {
           localStorage.removeItem('auth_token')
         }
