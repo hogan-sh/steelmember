@@ -166,7 +166,7 @@ const fetchData = async () => {
   }
 }
 
-onMounted(fetchData)
+if (process.client) fetchData()
 
 const openModal = (item?: PsiProductCode) => {
   errorMsg.value = ''
