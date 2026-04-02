@@ -40,6 +40,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET || 'steelmember-secret-key-2024',
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
     public: {
       supabaseUrl: process.env.SUPABASE_URL || '',
       supabaseKey: process.env.SUPABASE_KEY || '',
