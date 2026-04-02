@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import type { PsiProductCode } from '~/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+definePageMeta({ layout: 'admin', middleware: 'admin', ssr: false })
 
 const loading = ref(true)
 const items = ref<PsiProductCode[]>([])
