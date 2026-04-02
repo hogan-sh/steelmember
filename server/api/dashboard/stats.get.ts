@@ -6,7 +6,7 @@ export default defineEventHandler(async () => {
 
     const [membersResult, feesResult, logsResult] = await Promise.all([
       supabase.from('members').select('member_status, factory_area, major_number'),
-      supabase.from('member_fees').select('*').is('pay_date', null).limit(10),
+      supabase.from('member_fees').select('*, members(member_name, short_name)').order('created_at', { ascending: false }).limit(10),
       supabase.from('change_logs').select('*, members(member_name)').order('created_at', { ascending: false }).limit(10),
     ])
 
